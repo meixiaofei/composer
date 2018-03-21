@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "files": ["lib/helper.php"],
-        "psr-4": {"fei": "class/"}
+        "psr-4": {"meixiaofei": "class/"}
     },
     "require": {
         "phpexcel/phpexcel": "^1.7"
