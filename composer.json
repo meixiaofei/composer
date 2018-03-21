@@ -4,6 +4,7 @@
     "description": "Self use composer",
     "homepage": "https://github.com/meixiaofei/composer",
     "license": "MIT",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Fei Liu",
