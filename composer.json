@@ -1,0 +1,17 @@
+{
+    "name": "fei/composer",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Fei Liu",
+            "email": "chenhunmuxi@qq.com"
+        }
+    ],
+    "autoload": {
+        "files": ["lib/helper.php"],
+        "psr-4": {"": "class/"}
+    },
+    "require": {
+        "phpexcel/phpexcel": "^1.7"
+    }
+}
