@@ -1,6 +1,9 @@
 {
     "name": "fei/composer",
-    "type": "project",
+    "type": "library",
+    "description": "Self use composer",
+    "homepage": "https://github.com/meixiaofei/composer",
+    "license": "MIT",
     "authors": [
         {
             "name": "Fei Liu",
@@ -9,7 +12,7 @@
     ],
     "autoload": {
         "files": ["lib/helper.php"],
-        "psr-4": {"": "class/"}
+        "psr-4": {"fei": "class/"}
     },
     "require": {
         "phpexcel/phpexcel": "^1.7"

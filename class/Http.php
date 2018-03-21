@@ -1,5 +1,7 @@
 <?php
 
+namespace fei;
+
 Class Http
 {
     const CURL_TIMEOUT           = 10;
