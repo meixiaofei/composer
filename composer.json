@@ -6,6 +6,10 @@
         "phpexcel/phpexcel": "^1.7"
     },
     "license": "MIT",
+    "autoload": {
+        "files": ["lib/helper.php"],
+        "psr-4": {"meixiaofei\\": "class/"}
+    },
     "authors": [
         {
             "name": "Fei Liu",
