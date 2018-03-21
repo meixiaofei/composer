@@ -2,9 +2,6 @@
     "name": "meixiaofei/composer",
     "description": "Self use composer",
     "type": "library",
-    "require": {
-        "phpexcel/phpexcel": "^1.7"
-    },
     "license": "MIT",
     "autoload": {
         "files": ["lib/helper.php"],
