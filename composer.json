@@ -12,5 +12,8 @@
             "name": "Fei Liu",
             "email": "chenhunmuxi@qq.com"
         }
-    ]
+    ],
+    "require": {
+        "phpoffice/phpspreadsheet": "^1.6"
+    }
 }
