@@ -4,8 +4,8 @@
     "type": "library",
     "license": "MIT",
     "autoload": {
-        "files": ["lib/helper.php"],
-        "psr-4": {"meixiaofei\\": "class/"}
+        "files": ["helper.php"],
+        "psr-4": {"meixiaofei\\": ""}
     },
     "authors": [
         {

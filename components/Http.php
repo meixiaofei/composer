@@ -1,13 +1,13 @@
 <?php
 
-namespace meixiaofei;
+namespace meixiaofei\components;
 
 Class Http
 {
     const CURL_TIMEOUT           = 10;
     const MULTIPLE_REQUEST_LIMIT = 20;
     const MAX_REQUESTS           = 10;
-    
+
     /**
      * Multiple requests: at most 10 request urls for each request
      * @param $requests
@@ -32,10 +32,10 @@ Class Http
             $res           = $this->multipleThreadsRequest($requestsArray);
             $responseArray = $responseArray + $res;
         }
-        
+
         return $responseArray;
     }
-    
+
     /**
      * Multiple threads curl requests
      * @param $urls
@@ -60,16 +60,16 @@ Class Http
             curl_multi_exec($mh, $running);
             curl_multi_select($mh);
         } while ($running > 0);
-        
+
         $res = [];
         foreach ($urls as $i => $url) {
             $res[$i] = curl_multi_getcontent($curlArray[$i]);
             curl_multi_remove_handle($mh, $curlArray[$i]);
         }
-        
+
         unset($curlArray);
         curl_multi_close($mh);
-        
+
         return $res;
     }
 }
