@@ -72,7 +72,7 @@ class AuthUserRole extends _Base
     public static function setUserRoles($uid = '', $roleIds = [])
     {
         if (!is_numeric($uid)) {
-            return self::modReturn(FAIL, '需要指定用户id');
+            return self::modReturn(0, '需要指定用户id');
         }
         self::deleteAll(['uid' => $uid]);
         foreach ($roleIds as &$roleId) {
