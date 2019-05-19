@@ -148,6 +148,31 @@ class _Base extends ActiveRecord
         return $range;
     }
 
+    public static function getCommonList($param = [], callable $whereFunc = null)
+    {
+        $param = self::prepareParam($param);
+
+        $query = self::find();
+
+        /**
+         *  执行回调
+         *  function($query){
+         *      $query->andWhere()
+         *      $query->andOrderBy()
+         *      ...
+         *  }
+         */
+        if (is_callable($whereFunc)) {
+            $whereFunc($query);
+        }
+
+        $totalNum = $query->count();
+
+        $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy('id desc')->asArray()->all();
+
+        return ['totalNum' => $totalNum, 'currentPage' => $param['page'], 'limit' => $param['limit'], 'lists' => $lists];
+    }
+
     public static function getList($param = [])
     {
         $param = self::prepareParam($param);
