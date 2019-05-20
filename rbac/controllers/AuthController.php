@@ -258,7 +258,7 @@ class AuthController extends TopController
     }
 
     /**
-     * @api      {post} /rbac/auth/user-list 后台用户列表
+     * @api      {get} /rbac/auth/user-list 后台用户列表
      * @apiGroup 权限模块
      *
      * @apiParam {String} [username] 用户名

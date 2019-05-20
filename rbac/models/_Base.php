@@ -20,7 +20,7 @@ class _Base extends ActiveRecord
      */
     public static function modReturn($code = 1, $msg = '', $data = [])
     {
-        return ['code' => $code, 'msg' => $msg ?: ($code ? '操作成功' : '操作失败'), 'data' => $data];
+        return ['code' => (int)$code, 'msg' => $msg ?: ($code ? '操作成功' : '操作失败'), 'data' => $data];
     }
 
     /**
@@ -37,6 +37,39 @@ class _Base extends ActiveRecord
     public static function user()
     {
         return self::app()->user;
+    }
+
+    /**
+     * @param null $name
+     * @param null $defaultValue
+     *
+     * @return array|mixed
+     */
+    public static function get($name = null, $defaultValue = null)
+    {
+        return self::app()->request->get($name, $defaultValue);
+    }
+
+    /**
+     * @param null $name
+     * @param null $defaultValue
+     *
+     * @return array
+     */
+    public static function input($name = null, $defaultValue = null)
+    {
+        return array_merge(self::post($name, $defaultValue), self::get($name, $defaultValue));
+    }
+
+    /**
+     * @param null $name
+     * @param null $defaultValue
+     *
+     * @return array|mixed
+     */
+    public static function post($name = null, $defaultValue = null)
+    {
+        return self::app()->request->post($name, $defaultValue);
     }
 
     /**
@@ -152,7 +185,7 @@ class _Base extends ActiveRecord
     {
         $param = self::prepareParam($param);
 
-        $query = self::find();
+        $query = static::find();
 
         /**
          *  执行回调
@@ -177,7 +210,7 @@ class _Base extends ActiveRecord
     {
         $param = self::prepareParam($param);
 
-        $query = self::find()->where(['status' => 1]);
+        $query = static::find()->where(['status' => 1]);
         if (isset($param['cid'])) {
             $query->andWhere(['cid' => $param['cid']]);
         }
@@ -191,7 +224,7 @@ class _Base extends ActiveRecord
 
     public static function softDelete($id)
     {
-        return self::updateAll(['deleted_at' => null], ['id' => $id]);
+        return static::updateAll(['deleted_at' => null], ['id' => $id]);
     }
 
     public static function getGeo($hash = true)
@@ -204,5 +237,10 @@ class _Base extends ActiveRecord
         }
 
         return $geo;
+    }
+
+    public static function getAuthScalar($field)
+    {
+        return static::find()->select($field)->where(['uid' => self::input('uid', self::user()->id)])->scalar();
     }
 }
