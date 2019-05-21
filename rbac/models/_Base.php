@@ -58,6 +58,10 @@ class _Base extends ActiveRecord
      */
     public static function input($name = null, $defaultValue = null)
     {
+        if ($name) {
+            return self::get($name, $defaultValue) ?: self::post($name, $defaultValue);
+        }
+
         return array_merge(self::post($name, $defaultValue), self::get($name, $defaultValue));
     }
 
@@ -239,8 +243,82 @@ class _Base extends ActiveRecord
         return $geo;
     }
 
-    public static function getAuthScalar($field)
+    public static function getAuthScalar($field, $userId = null)
     {
-        return static::find()->select($field)->where(['uid' => self::input('uid', self::user()->id)])->scalar();
+        return static::find()->select($field)->where(['uid' => self::input('uid', $userId ?: self::user()->id)])->scalar();
+    }
+
+    public static function getAuthColumn($field, $userId = null)
+    {
+        return static::find()->select($field)->where(['uid' => self::input('uid', $userId ?: self::user()->id)])->column();
+    }
+
+    /**
+     * 角色是否为: 超管
+     *
+     * @param null $userId
+     *
+     * @return bool
+     */
+    public static function isSuperUser($userId = null)
+    {
+        return self::isTheRoleById(1, $userId);
+    }
+
+    /**
+     *
+     * $whenArr = [
+     * ['key' => 1, 'value' => '待初审'],
+     * ['key' => 2, 'value' => '待复审'],
+     * ['key' => 3, 'value' => '待打款'],
+     * ['key' => 4, 'value' => '审核不通过'],
+     * ['key' => 5, 'value' => '确认打款'],
+     * ['key' => 6, 'value' => '打款失败'],
+     * ]
+     *
+     * 最终生成的select
+     * CASE filed WHEN 0 THEN '00' WHEN 1 THEN '11' ELSE 'OTHERS' END AS alias
+     *
+     * @param      $filed
+     * @param      $whenArr
+     * @param null $else
+     * @param null $alias
+     *
+     * @return string
+     */
+    public static function buildCaseSelect($filed, $whenArr, $else = null, $alias = null)
+    {
+        $caseSelect = "CASE $filed ";
+        foreach ($whenArr as $when) {
+            $caseSelect .= 'WHEN ' . self::db()->quoteValue($when['key']) . ' THEN ' . self::db()->quoteValue($when['value']) . ' ';
+        }
+        if ($else) {
+            $caseSelect .= 'ELSE ' . $else . ' ';
+        }
+        $caseSelect .= 'END';
+        if ($alias) {
+            $caseSelect .= ' AS ' . $alias;
+        }
+
+        return new Expression($caseSelect);
+    }
+
+    /**
+     * @param array $roleId
+     * @param null  $userId
+     *
+     * @return bool
+     */
+    private static function isTheRoleById($roleId = [], $userId = null)
+    {
+        $allRoleId = AuthUserRole::getAuthColumn('role_id', $userId);
+        if (is_numeric($roleId)) {
+            $roleId = [$roleId];
+        }
+        if (array_intersect($roleId, $allRoleId)) {
+            return true;
+        }
+
+        return false;
     }
 }

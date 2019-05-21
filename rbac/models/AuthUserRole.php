@@ -97,4 +97,21 @@ class AuthUserRole extends _Base
 
         return self::modReturn();
     }
+
+    /**
+     * 根据用户id查询到用户所有的角色名称
+     *
+     * @param $uid
+     *
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public static function getUserRoleNameByUser($uid)
+    {
+        return static::find()->alias('user_role')
+            ->select(['name', 'role_id'])
+            ->leftJoin(AuthRole::tableName() . ' AS role', 'role.id = user_role.role_id')
+            ->where(['user_role.uid' => $uid, 'role.status' => 1])
+            ->asArray()
+            ->all();
+    }
 }
