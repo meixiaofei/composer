@@ -5,6 +5,7 @@ namespace meixiaofei\rbac\models;
 use common\components\GeoHash;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 
 class _Base extends ActiveRecord
 {
@@ -12,7 +13,7 @@ class _Base extends ActiveRecord
     static $geoHashLevel     = 1;
 
     /**
-     * @param string $code
+     * @param int $code
      * @param string $msg
      * @param array  $data
      *
@@ -185,7 +186,14 @@ class _Base extends ActiveRecord
         return $range;
     }
 
-    public static function getCommonList($param = [], callable $whereFunc = null)
+    /**
+     * @param array         $param
+     * @param callable|null $whereFunc
+     * @param string        $orderBy
+     *
+     * @return array
+     */
+    public static function getCommonList($param = [], callable $whereFunc = null, $orderBy = 'id desc')
     {
         $param = self::prepareParam($param);
 
@@ -205,12 +213,19 @@ class _Base extends ActiveRecord
 
         $totalNum = $query->count();
 
-        $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy('id desc')->asArray()->all();
+        $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy($orderBy)->asArray()->all();
 
         return ['totalNum' => $totalNum, 'currentPage' => $param['page'], 'limit' => $param['limit'], 'lists' => $lists];
     }
 
-    public static function getList($param = [])
+    /**
+     * @param array         $param
+     * @param callable|null $whereFunc
+     * @param string        $orderBy
+     *
+     * @return array
+     */
+    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
         $param = self::prepareParam($param);
 
@@ -218,10 +233,21 @@ class _Base extends ActiveRecord
         if (isset($param['cid'])) {
             $query->andWhere(['cid' => $param['cid']]);
         }
+        /**
+         *  执行回调
+         *  function($query){
+         *      $query->andWhere()
+         *      $query->andOrderBy()
+         *      ...
+         *  }
+         */
+        if (is_callable($whereFunc)) {
+            $whereFunc($query);
+        }
 
         $totalNum = $query->count();
 
-        $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy('sort,id desc')->asArray()->all();
+        $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy($orderBy)->asArray()->all();
 
         return ['totalNum' => $totalNum, 'currentPage' => $param['page'], 'limit' => $param['limit'], 'lists' => $lists];
     }

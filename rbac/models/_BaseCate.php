@@ -102,13 +102,13 @@ class _BaseCate extends _Base
      *
      * @return array|string
      */
-    public static function getChildrenIds($categories = [], $id, $needArray = true, $self = false , $keyName = 'id')
+    public static function getChildrenIds($categories = [], $id, $needArray = true, $self = false, $keyName = 'id')
     {
         $arr = [];
         foreach ($categories as $category) {
             if ($category['pid'] == $id) {
                 $arr[] = $category[$keyName];
-                $arr   = array_merge($arr, self::getChildrenIds($categories, $category[$keyName],$needArray,$self,$keyName));
+                $arr   = array_merge($arr, self::getChildrenIds($categories, $category[$keyName], $needArray, $self, $keyName));
             }
         }
 
@@ -119,9 +119,29 @@ class _BaseCate extends _Base
         return $needArray ? $arr : implode(',', $arr);
     }
 
-    public static function getList($param = [])
+    /**
+     * @param array         $param
+     * @param callable|null $whereFunc
+     * @param string        $orderBy
+     *
+     * @return array
+     */
+    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
-        return static::find()->where(['status' => 1])->orderBy('sort,id desc')->asArray()->all();
+        $query = static::find()->where(['status' => 1]);
+        /**
+         *  执行回调
+         *  function($query){
+         *      $query->andWhere()
+         *      $query->andOrderBy()
+         *      ...
+         *  }
+         */
+        if (is_callable($whereFunc)) {
+            $whereFunc($query);
+        }
+
+        return $query->orderBy($orderBy)->asArray()->all();
     }
 
     public static function getCateList()
