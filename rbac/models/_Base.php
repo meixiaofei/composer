@@ -140,6 +140,7 @@ class _Base extends ActiveRecord
      */
     public static function prepareParam($param = [], $default = [])
     {
+        $default['like'] = [];
         foreach (array_keys($param) as $keyName) {
             if (is_string($param[$keyName])) {
                 $trimValue = trim($param[$keyName]);
@@ -207,11 +208,6 @@ class _Base extends ActiveRecord
 
         $query = static::find();
 
-        $validateField = array_keys(array_intersect_key($param, (new static())->getAttributes()));
-        foreach ($validateField as $field) {
-            $query->andWhere([$field => $param[$field]]);
-        }
-
         /**
          *  执行回调
          *  function($query){
@@ -223,12 +219,53 @@ class _Base extends ActiveRecord
         if (is_callable($whereFunc)) {
             $whereFunc($query);
         }
+        $alreadyUsedFields = self::getWhereField((array)$query->where);
+        $validateField     = array_diff(array_keys(array_intersect_key($param, (new static())->getAttributes())), $alreadyUsedFields);
+        foreach ($validateField as $field) {
+            $query->andWhere([$field => $param[$field]]);
+        }
+
+        foreach ($param['like'] as $likeField) {
+            if (isset($param[$likeField])) {
+                $query->andWhere(['like', $likeField, "$param[$likeField]%", false]);
+            }
+        }
+
+        if (isset($param['created_at_range'])) {
+            $query->andWhere(['between', 'created_at', self::explodeTimeRange($param['created_at_range'])]);
+        }
 
         $totalNum = $query->count();
 
         $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy($orderBy)->asArray()->all();
 
         return ['totalNum' => $totalNum, 'currentPage' => $param['page'], 'limit' => $param['limit'], 'lists' => $lists];
+    }
+
+    /**
+     * @param $conditions
+     *
+     * @return array
+     */
+    public static function getWhereField($conditions)
+    {
+        $fields = [];
+        foreach ($conditions as $condition) {
+            if (is_array($condition)) {
+                if (isset($condition[1])) {
+                    array_push($fields, $condition[1]);
+                } else {
+                    foreach (array_keys($condition) as $field) {
+                        array_push($fields, $field);
+                    }
+                }
+            } else {
+                list($field) = explode(' = ', $condition);
+                array_push($fields, $field);
+            }
+        }
+
+        return array_unique($fields);
     }
 
     public static function softDelete($id)
