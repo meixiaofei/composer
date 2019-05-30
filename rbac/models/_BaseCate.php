@@ -128,7 +128,15 @@ class _BaseCate extends _Base
      */
     public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
-        $query = static::find()->where(['status' => 1]);
+        $param = self::prepareParam($param, ['status' => 1]);
+
+        $query = static::find();
+
+        $validateField = array_keys(array_intersect_key($param, (new static())->getAttributes()));
+        foreach ($validateField as $field) {
+            $query->andWhere([$field => $param[$field]]);
+        }
+
         /**
          *  执行回调
          *  function($query){

@@ -10,10 +10,18 @@ use yii\db\Expression;
 class _Base extends ActiveRecord
 {
     static $unifiedUserField = 'user.id as user_id, user.username, user.avatar, user.gender';
-    static $geoHashLevel     = 1;
+    static $geoHashLevel = 1;
 
     /**
-     * @param int $code
+     * @return false|string
+     */
+    public static function getNow()
+    {
+        return date('Y-m-d H:i:s');
+    }
+
+    /**
+     * @param int    $code
      * @param string $msg
      * @param array  $data
      *
@@ -193,46 +201,17 @@ class _Base extends ActiveRecord
      *
      * @return array
      */
-    public static function getCommonList($param = [], callable $whereFunc = null, $orderBy = 'id desc')
+    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
-        $param = self::prepareParam($param);
+        $param = self::prepareParam($param, ['status' => 1]);
 
         $query = static::find();
 
-        /**
-         *  执行回调
-         *  function($query){
-         *      $query->andWhere()
-         *      $query->andOrderBy()
-         *      ...
-         *  }
-         */
-        if (is_callable($whereFunc)) {
-            $whereFunc($query);
+        $validateField = array_keys(array_intersect_key($param, (new static())->getAttributes()));
+        foreach ($validateField as $field) {
+            $query->andWhere([$field => $param[$field]]);
         }
 
-        $totalNum = $query->count();
-
-        $lists = $query->offset($param['offset'])->limit($param['limit'])->orderBy($orderBy)->asArray()->all();
-
-        return ['totalNum' => $totalNum, 'currentPage' => $param['page'], 'limit' => $param['limit'], 'lists' => $lists];
-    }
-
-    /**
-     * @param array         $param
-     * @param callable|null $whereFunc
-     * @param string        $orderBy
-     *
-     * @return array
-     */
-    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
-    {
-        $param = self::prepareParam($param);
-
-        $query = static::find()->where(['status' => 1]);
-        if (isset($param['cid'])) {
-            $query->andWhere(['cid' => $param['cid']]);
-        }
         /**
          *  执行回调
          *  function($query){
