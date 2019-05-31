@@ -232,7 +232,8 @@ class _Base extends ActiveRecord
         }
 
         if (isset($param['created_at_range'])) {
-            $query->andWhere(['between', 'created_at', self::explodeTimeRange($param['created_at_range'])]);
+            $range = self::explodeTimeRange($param['created_at_range']);
+            $query->andWhere(['between', 'created_at', $range[0], $range[1]]);
         }
 
         $totalNum = $query->count();
