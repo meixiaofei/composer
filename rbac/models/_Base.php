@@ -11,6 +11,7 @@ class _Base extends ActiveRecord
 {
     static $unifiedUserField = 'user.id as user_id, user.username, user.avatar, user.gender';
     static $geoHashLevel = 1;
+    static $isSuperUser = null;
 
     /**
      * @return false|string
@@ -201,12 +202,13 @@ class _Base extends ActiveRecord
      * @param string        $orderBy
      *
      * @return array
+     * @throws \Exception
      */
-    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
+    public static function getList(&$param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
-        $param = self::prepareParam($param, ['status' => 1]);
-
-        $query = static::find();
+        $param['default'] = $param['default'] ?? [];
+        $param            = self::prepareParam($param, array_merge(['status' => 1], $param['default']));
+        $query            = static::find();
 
         /**
          *  执行回调
@@ -305,7 +307,11 @@ class _Base extends ActiveRecord
      */
     public static function isSuperUser($userId = null)
     {
-        return self::isTheRoleById(1, $userId);
+        if (self::$isSuperUser !== null) {
+            return self::$isSuperUser;
+        }
+
+        return self::$isSuperUser = self::isTheRoleById(1, $userId);
     }
 
     /**
@@ -363,5 +369,23 @@ class _Base extends ActiveRecord
         }
 
         return false;
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function generateApiDoc()
+    {
+        $doc = '';
+        foreach (static::getTableSchema()->columns as $column) {
+            $type    = ucfirst($column->phpType);
+            $comment = $column->comment ?: $column->name;
+            if ($column->defaultValue) {
+                $doc .= "* @apiParam {{$type}} [{$column->name}={$column->defaultValue}] {$comment}<br/>";
+            } else {
+                $doc .= "* @apiParam {{$type}} [{$column->name}] {$comment}<br/>";
+            }
+        }
+        die($doc);
     }
 }

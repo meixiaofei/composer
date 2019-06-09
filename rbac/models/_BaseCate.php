@@ -126,11 +126,11 @@ class _BaseCate extends _Base
      *
      * @return array
      */
-    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
+    public static function getList(&$param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
-        $param = self::prepareParam($param, ['status' => 1]);
-
-        $query = static::find();
+        $param['default'] = $param['default'] ?? [];
+        $param            = self::prepareParam($param, array_merge(['status' => 1], $param['default']));
+        $query            = static::find();
 
         $validateField = array_keys(array_intersect_key($param, (new static())->getAttributes()));
         foreach ($validateField as $field) {
