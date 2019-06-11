@@ -204,7 +204,7 @@ class _Base extends ActiveRecord
      * @return array
      * @throws \Exception
      */
-    public static function getList(&$param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
+    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
         $param['default'] = $param['default'] ?? [];
         $param            = self::prepareParam($param, array_merge(['status' => 1], $param['default']));
@@ -219,7 +219,7 @@ class _Base extends ActiveRecord
          *  }
          */
         if (is_callable($whereFunc)) {
-            $whereFunc($query);
+            $whereFunc($query, $param);
         }
         $alreadyUsedFields = self::getWhereField((array)$query->where);
         $validateField     = array_diff(array_keys(array_intersect_key($param, (new static())->getAttributes())), $alreadyUsedFields);

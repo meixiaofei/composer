@@ -126,7 +126,7 @@ class _BaseCate extends _Base
      *
      * @return array
      */
-    public static function getList(&$param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
+    public static function getList($param = [], callable $whereFunc = null, $orderBy = 'id desc,sort desc')
     {
         $param['default'] = $param['default'] ?? [];
         $param            = self::prepareParam($param, array_merge(['status' => 1], $param['default']));
@@ -146,7 +146,7 @@ class _BaseCate extends _Base
          *  }
          */
         if (is_callable($whereFunc)) {
-            $whereFunc($query);
+            $whereFunc($query, $param);
         }
 
         return $query->orderBy($orderBy)->asArray()->all();
