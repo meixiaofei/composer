@@ -10,6 +10,16 @@ function fei_print($arr = [], $die = true)
     $die && die;
 }
 
+function my_json_encode($value, $options = 0, $depth = 512)
+{
+    return json_encode($value, JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, $depth);
+}
+
+function my_json_decode($json, $assoc = true, $depth = 512)
+{
+    return json_decode($json, $assoc, $depth);
+}
+
 /**
  * @param $array
  * @param $position

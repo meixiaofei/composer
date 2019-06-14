@@ -224,7 +224,7 @@ class _Base extends ActiveRecord
         $alreadyUsedFields = self::getWhereField((array)$query->where);
         $validateField     = array_diff(array_keys(array_intersect_key($param, (new static())->getAttributes())), $alreadyUsedFields);
         foreach ($validateField as $field) {
-            $query->andWhere([$field => $param[$field]]);
+            $param[$field] !== 998 && $query->andWhere([$field => $param[$field]]);
         }
 
         foreach ($param['like'] as $likeField) {
