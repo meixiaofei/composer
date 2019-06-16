@@ -221,11 +221,6 @@ class _Base extends ActiveRecord
         if (is_callable($whereFunc)) {
             $whereFunc($query, $param);
         }
-        $alreadyUsedFields = self::getWhereField((array)$query->where);
-        $validateField     = array_diff(array_keys(array_intersect_key($param, (new static())->getAttributes())), $alreadyUsedFields);
-        foreach ($validateField as $field) {
-            $param[$field] !== 998 && $query->andWhere([$field => $param[$field]]);
-        }
 
         foreach ($param['like'] as $likeField) {
             if (isset($param[$likeField])) {
@@ -236,6 +231,12 @@ class _Base extends ActiveRecord
         if (isset($param['created_at_range'])) {
             $range = self::explodeTimeRange($param['created_at_range']);
             $query->andWhere(['between', 'created_at', $range[0], $range[1]]);
+        }
+
+        $alreadyUsedFields = self::getWhereField((array)$query->where);
+        $validateField     = array_diff(array_keys(array_intersect_key($param, (new static())->getAttributes())), $alreadyUsedFields);
+        foreach ($validateField as $field) {
+            $param[$field] !== 998 && $query->andWhere([$field => $param[$field]]);
         }
 
         $totalNum = $query->count();
