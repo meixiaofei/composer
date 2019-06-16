@@ -229,7 +229,7 @@ class _Base extends ActiveRecord
 
         foreach ($param['like'] as $likeField) {
             if (isset($param[$likeField])) {
-                $query->andWhere(['like', $likeField, "$param[$likeField]%", false]);
+                $query->andWhere(['like', $likeField, $param[$likeField]]);
             }
         }
 

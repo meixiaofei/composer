@@ -10,14 +10,122 @@ function fei_print($arr = [], $die = true)
     $die && die;
 }
 
+/**
+ * @param     $value
+ * @param int $options
+ * @param int $depth
+ *
+ * @return mixed
+ */
 function my_json_encode($value, $options = 0, $depth = 512)
 {
     return json_encode($value, JSON_NUMERIC_CHECK | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE, $depth);
 }
 
+/**
+ * @param      $json
+ * @param bool $assoc
+ * @param int  $depth
+ *
+ * @return mixed
+ */
 function my_json_decode($json, $assoc = true, $depth = 512)
 {
     return json_decode($json, $assoc, $depth);
+}
+
+/**
+ * @param $str
+ * @param $find
+ *
+ * @return bool
+ */
+function check_str($str, $find)
+{
+    if (count(explode($find, $str)) > 1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+/**
+ * @param $str
+ *
+ * @return false|int
+ */
+function is_mobile($str)
+{
+    return preg_match('/^1[34578]\d{9}$/', $str);
+}
+
+/**
+ * @param $str
+ *
+ * @return false|int
+ */
+function is_email($str)
+{
+    return preg_match('/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/', $str);
+}
+
+/**
+ * 获取数组目标值
+ *
+ * @param array $array
+ * @param        $value
+ * @param string $targetKey
+ * @param string|bool $targetValue
+ * @param string $default
+ *
+ * @return string
+ */
+function get_target_value(array $array, $value, $targetKey = 'key', $targetValue = 'value', $default = '--')
+{
+    $result = $default;
+    foreach ($array as $index => &$val) {
+        if (isset($val[$targetKey]) && $val[$targetKey] == $value) {
+            if (is_bool($targetValue)) {
+                $result = $val;
+            } else {
+                $result = $val[$targetValue];
+            }
+            break;
+        } else if ($val == $value) {
+            return $index + 1;
+        }
+    }
+    unset($array);
+
+    return $result;
+}
+
+/**
+ * 获取数组目标值
+ *
+ * @param array $array
+ * @param        $value
+ * @param string $targetKey
+ * @param string|bool $targetValue
+ * @param array $default
+ *
+ * @return array
+ */
+function get_target_values(array $array, $value, $targetKey = 'key', $targetValue = 'value', $default = [])
+{
+    $result = $default;
+    foreach ($array as &$val) {
+        if (isset($val[$targetKey]) && $val[$targetKey] == $value) {
+            if (is_bool($targetValue)) {
+                $result[] = $val;
+            } else {
+                $result[] = $val[$targetValue];
+            }
+        }
+    }
+    unset($array);
+
+    return $result;
 }
 
 /**
