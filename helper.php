@@ -283,19 +283,7 @@ function read_excel($filename)
 
     $data = [];
     for ($i = 0, $sheetLength = $spreadsheet->getSheetCount(); $i < $sheetLength; $i++) {
-        $objWorksheet       = $spreadsheet->getSheet($i);
-        $highestRow         = $objWorksheet->getHighestRow();
-        $highestColumn      = $objWorksheet->getHighestColumn();
-        $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
-        $excelData          = [];
-        // the zero index row is alpha A-Z...AA-ZZ
-        for ($row = 1; $row <= $highestRow; $row++) {
-            for ($col = 0; $col < $highestColumnIndex; $col++) {
-                $value                 = (string)$objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
-                $excelData[$row - 1][] = $value;
-            }
-        }
-        $data[] = $excelData;
+        $data[] = $spreadsheet->getSheet($i)->toArray();
     }
 
     return $data;
